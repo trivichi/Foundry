@@ -526,6 +526,7 @@ body::after {
   margin-bottom: 0.5rem;
 }
 
+// verify btn for found items
 #verificationMessage {
   margin-top: 1rem;
   padding: 0.5rem;
@@ -535,4 +536,16 @@ body::after {
 .verify-btn {
   width: 100%;
   margin-top: 1rem;
+}
+
+// remove btn for lost items
+.remove-btn {
+    width: 100%;
+    margin-top: 1rem;
+    background-color: #dc3545;
+    color: white;
+}
+
+.remove-btn:hover {
+    background-color: #c82333;
 }

@@ -152,10 +152,45 @@ document.addEventListener('DOMContentLoaded', () => {
           <p><strong>Location:</strong> ${item.location}</p>
           <p><strong>Contact:</strong> ${item.contact}</p>
           <p class="coordinates"><small>📍 ${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</small></p>
+          <button class="btn secondary remove-btn" data-item-id="${item._id}">
+            Remove Request
+          </button>
         </div>
       `;
 
       container.appendChild(card);
+
+      // Add click handler for the remove button
+      const removeBtn = card.querySelector('.remove-btn');
+      removeBtn.addEventListener('click', async () => {
+        if (confirm('Are you sure you want to remove this lost item request?')) {
+          try {
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('item_id', item._id);
+
+            const response = await fetch('https://backendofhackapi.onrender.com/delete-item', {
+              method: 'DELETE',
+              headers: {
+                'Authorization': `Bearer ${token}`
+              },
+              body: formData  // Send FormData with the DELETE request
+            });
+
+            if (response.ok) {
+              alert('Lost item request removed successfully');
+              // Refresh the list
+              fetchMyItems();
+            } else {
+              const error = await response.json();
+              throw new Error(error.detail || 'Failed to remove lost item');
+            }
+          } catch (error) {
+            console.error('Error removing lost item:', error);
+            alert(error.message || 'Failed to remove lost item. Please try again.');
+          }
+        }
+      });
     });
   }
 
