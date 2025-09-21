@@ -97,15 +97,15 @@ function updateAuthHeader() {
   const authButtons = document.querySelector('.auth-buttons');
   if (!authButtons) return;
 
-  const user = JSON.parse(localStorage.getItem('user'));
-  const token = localStorage.getItem('token');
+  // const user = JSON.parse(localStorage.getItem('user'));
+  // const token = localStorage.getItem('token');
 
-  
 }
 
 // Logout function
-function logout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = 'index.html';
-}});
+// function logout() {
+//   localStorage.removeItem('token');
+//   localStorage.removeItem('user');
+//   window.location.href = 'index.html';
+// }
+});

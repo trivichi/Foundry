@@ -110,8 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
-
-  // Replace the existing render and fetchFoundItems functions with these
+  
+    // Fetch and render found items
   async function fetchMyItems() {
     const token = localStorage.getItem("token");
     if (!token) return;
