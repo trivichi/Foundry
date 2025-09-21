@@ -111,7 +111,78 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-    // Fetch and render found items
+  // Move these functions before fetchMyItems
+  function addVerificationModal() {
+    const modal = document.createElement('div');
+    modal.id = 'verificationModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Verify Item Owner</h2>
+        <form id="verificationForm">
+          <div class="form-group">
+            <label for="ownerEmail">Owner's Email</label>
+            <input type="email" id="ownerEmail" required>
+            <button type="button" id="sendOTP" class="btn secondary">Send OTP</button>
+          </div>
+          <div class="form-group otp-group" style="display: none;">
+            <label for="otp">Enter OTP</label>
+            <input type="text" id="otp" maxlength="6" required>
+            <button type="submit" class="btn primary">Verify OTP</button>
+          </div>
+        </form>
+        <div id="verificationMessage"></div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Add modal close functionality
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.onclick = () => {
+      modal.style.display = 'none';
+      resetVerificationForm();
+    };
+
+    window.onclick = (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+        resetVerificationForm();
+      }
+    };
+  }
+
+  function resetVerificationForm() {
+    const form = document.getElementById('verificationForm');
+    if (!form) return;
+    const otpGroup = form.querySelector('.otp-group');
+    const message = document.getElementById('verificationMessage');
+    
+    form.reset();
+    if (otpGroup) otpGroup.style.display = 'none';
+    if (message) message.textContent = '';
+  }
+
+  let currentItemId = null;
+
+  function handleVerification(e) {
+    e.preventDefault();
+    const modal = document.getElementById('verificationModal');
+    if (!modal) {
+      console.error('Verification modal not found');
+      addVerificationModal(); // Add modal if it doesn't exist
+      return handleVerification(e); // Retry after adding modal
+    }
+    const btn = e.target;
+    currentItemId = btn.dataset.itemId;
+    modal.style.display = 'block';
+  }
+
+  // Add verification modal to the page immediately
+  addVerificationModal();
+
+  // Fetch and render found items
   async function fetchMyItems() {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -154,10 +225,101 @@ document.addEventListener('DOMContentLoaded', () => {
           <p><strong>Location:</strong> ${item.location}</p>
           <p><strong>Contact:</strong> ${item.contact}</p>
           <p class="coordinates"><small>📍 ${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</small></p>
+          <button class="btn primary verify-btn" data-item-id="${item._id}">
+            Verify Owner
+          </button>
         </div>
       `;
 
       container.appendChild(card);
+    });
+
+    // Add click handlers for verify buttons
+    container.querySelectorAll('.verify-btn').forEach(btn => {
+      btn.addEventListener('click', handleVerification);
+    });
+  }
+
+  const sendOTPBtn = document.getElementById('sendOTP');
+  // Update the sendOTPBtn
+  if (sendOTPBtn) {
+    sendOTPBtn.addEventListener('click', async () => {
+      const email = document.getElementById('ownerEmail').value;
+      if (!email) {
+        alert('Please enter owner\'s email');
+        return;
+      }
+
+      try {
+        // Get the item details from the card
+        const itemCard = document.querySelector(`[data-item-id="${currentItemId}"]`).closest('.card');
+        const itemName = itemCard.querySelector('h3').textContent;
+
+        // Create FormData object instead of JSON
+        const formData = new FormData();
+        formData.append('item_id', currentItemId);
+        formData.append('item_name', itemName);
+        formData.append('owner_email', email);
+
+        // Send as form data
+        const response = await fetch('https://backendofhackapi.onrender.com/send-otp', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData // Send as FormData
+        });
+        console.log(response);
+        if (response.ok) {
+          document.querySelector('.otp-group').style.display = 'block';
+          document.getElementById('verificationMessage').textContent = 'OTP sent successfully!';
+        } else {
+          const error = await response.json();
+          throw new Error(error.detail || 'Failed to send OTP');
+        }
+      } catch (error) {
+        console.error('Error sending OTP:', error);
+        document.getElementById('verificationMessage').textContent = 'Failed to send OTP. Please try again.';
+      }
+    });
+  }
+
+  const verificationForm = document.getElementById('verificationForm');
+  if (verificationForm) {
+    verificationForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const otp = document.getElementById('otp').value;
+
+      try {
+        // Create FormData object
+        const formData = new FormData();
+        formData.append('otp', otp);
+
+        const response = await fetch('https://backendofhackapi.onrender.com/verify-otp', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: formData
+        });
+
+        if (response.ok) {
+          document.getElementById('verificationMessage').textContent = 'Owner verified successfully!';
+          setTimeout(() => {
+            document.getElementById('verificationModal').style.display = 'none';
+            resetVerificationForm();
+            // Refresh the items list
+            fetchMyItems();
+          }, 2000);
+        } else {
+          const error = await response.json();
+          throw new Error(error.detail || 'Invalid OTP');
+        }
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        document.getElementById('verificationMessage').textContent = 'Invalid OTP. Please try again.';
+      }
     });
   }
 
@@ -214,8 +376,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (imagePreview) {
             imagePreview.innerHTML = '';
           }
-          const foundItems = await fetchFoundItems();
-          render(foundList, foundItems);
+        //   const foundItems = await fetchMyItems();
+        //   render(foundList, foundItems);
+        await fetchMyItems();
         } else {
           throw new Error(data.detail || 'Failed to report found item');
         }
