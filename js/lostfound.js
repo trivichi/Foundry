@@ -198,6 +198,77 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+  
+  // Lost item form handling
+  const lostForm = document.getElementById('lostForm');
+
+  if (lostForm) {
+    lostForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please login to report a lost item');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Get form data
+      const formData = new FormData();
+      
+      // Convert latitude and longitude to float
+      const lat = parseFloat(latitudeInput.value);
+      const lng = parseFloat(longitudeInput.value);
+
+      // Append all required fields
+      formData.append('title', lostForm.title.value);
+      formData.append('description', lostForm.description.value);
+      formData.append('latitude', lat);
+      formData.append('longitude', lng);
+      formData.append('location', locationInput.value);
+      formData.append('contact', lostForm.contact.value);
+
+      // Handle file upload
+      const fileInput = lostForm.querySelector('input[type="file"]');
+      if (fileInput.files[0]) {
+        formData.append('file', fileInput.files[0]);
+      } else {
+        alert('Please select an image file');
+        return;
+      }
+
+      try {
+        const response = await fetch('https://backendofhackapi.onrender.com/lost/add', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert('Lost item reported successfully');
+          lostForm.reset();
+          if (marker) {
+            map.removeLayer(marker);
+            marker = null;
+          }
+          // Clear the image preview if it exists
+          const imagePreview = document.getElementById('image-preview');
+          if (imagePreview) {
+            imagePreview.innerHTML = '';
+          }
+        } else {
+          throw new Error(data.detail || 'Failed to report lost item');
+        }
+      } catch (error) {
+        console.error('Error reporting lost item:', error);
+        alert(error.message || 'Failed to report lost item. Please try again.');
+      }
+    });
+  }
 
   // Initial render
   if (foundList) {

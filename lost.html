@@ -6,6 +6,11 @@
   <title>Foundry — Lost Items</title>
   <link rel="stylesheet" href="css/styles.css"/>
   <link rel="icon" type="image/png" href="assests/logo.png"/>
+  <!-- Added Leaflet CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <div class="video-background">
@@ -24,7 +29,25 @@
     <form id="lostForm" class="form" enctype="multipart/form-data">
       <label>Title <input type="text" name="title" required></label>
       <label>Description <textarea name="description" required></textarea></label>
-      <label>Location <input type="text" name="location"></label>
+      
+      <!-- Added location container with map -->
+      <div class="location-container">
+        <label>Location
+          <div class="location-input-group">
+            <input type="text" name="location" id="location-input" required>
+            <button type="button" class="btn secondary" id="use-current-location">
+              <i class="fas fa-map-marker-alt"></i> Use Current Location
+            </button>
+          </div>
+          <div class="coordinates-display">
+            <input type="hidden" name="latitude" id="latitude">
+            <input type="hidden" name="longitude" id="longitude">
+            <span id="coordinates-text"></span>
+          </div>
+        </label>
+        <div id="location-map" class="location-map"></div>
+      </div>
+
       <label>Contact <input type="text" name="contact"></label>
       <label>Upload Image <input type="file" name="image" accept="image/*"></label>
       <button type="submit" class="btn primary">Submit</button>
