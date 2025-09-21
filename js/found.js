@@ -1,4 +1,3 @@
-// Foundry Lost and Found JavaScript
 document.addEventListener('DOMContentLoaded', () => {
   const foundForm = document.getElementById('foundForm');
   const foundList = document.getElementById('found-items-list');
@@ -10,9 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const imageInput = document.getElementById('image-input');
   const imagePreview = document.getElementById('image-preview');
 
-  // Load data
-  const foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
-
   // Initialize map
   let map = null;
   let marker = null;
@@ -23,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
     
-    // Add click handler to map
     map.on('click', (e) => {
       updateLocation(e.latlng.lat, e.latlng.lng);
     });
@@ -68,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     longitudeInput.value = lng;
     coordinatesText.textContent = `📍 ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
 
-    // Reverse geocode to get address
     fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)
       .then(res => res.json())
       .then(data => {
@@ -95,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
           img.alt = 'Preview';
           imagePreview.appendChild(img);
 
-          // Extract GPS data if available
           if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -118,46 +111,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function render(list, items) {
-    list.innerHTML = '';
-    if (items.length === 0) {
-      list.innerHTML = '<p>No items yet.</p>';
+  // Replace the existing render and fetchFoundItems functions with these
+  async function fetchMyItems() {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("https://backendofhackapi.onrender.com/my/found", {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      console.log(data.items);
+      renderCards("found-items-list", data.items);
+    } catch (error) {
+      console.error('Error fetching items:', error);
+    }
+  }
+
+  function renderCards(containerId, items) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = "";
+
+    if (!items || items.length === 0) {
+      container.innerHTML = "<p>No found items reported yet.</p>";
       return;
     }
 
     items.forEach(item => {
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      
-      let locationHtml = '';
-      if (item.latitude && item.longitude) {
-        locationHtml = `
-          <p class="location">
-            📍 ${item.location}
-            <br>
-            <small>${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</small>
-          </p>
-        `;
-      }
-
-      let imagesHtml = '';
-      if (item.images && item.images.length > 0) {
-        imagesHtml = `
-          <div class="item-images">
-            ${item.images.map(img => `<img src="${img}" alt="Item image">`).join('')}
-          </div>
-        `;
-      }
+      const card = document.createElement("div");
+      card.className = "card";
 
       card.innerHTML = `
-        <h3>${item.title}</h3>
-        <p>${item.description}</p>
-        ${locationHtml}
-        ${imagesHtml}
-        <p class="contact">Contact: ${item.contact}</p>
-        <p class="timestamp">Posted: ${new Date(item.timestamp).toLocaleString()}</p>
+        <img src="${item.image_url}" alt="${item.title}" onerror="this.src='assests/placeholder.png'">
+        <div class="card-body">
+          <h3>${item.title}</h3>
+          <p><strong>Description:</strong> ${item.description}</p>
+          <p><strong>Location:</strong> ${item.location}</p>
+          <p><strong>Contact:</strong> ${item.contact}</p>
+          <p class="coordinates"><small>📍 ${item.latitude.toFixed(6)}, ${item.longitude.toFixed(6)}</small></p>
+        </div>
       `;
-      list.appendChild(card);
+
+      container.appendChild(card);
     });
   }
 
@@ -173,14 +173,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Get form data
       const formData = new FormData();
       
-      // Convert latitude and longitude to float
       const lat = parseFloat(latitudeInput.value);
       const lng = parseFloat(longitudeInput.value);
 
-      // Append all required fields
       formData.append('title', foundForm.title.value);
       formData.append('description', foundForm.description.value);
       formData.append('latitude', lat);
@@ -188,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
       formData.append('location', locationInput.value);
       formData.append('contact', foundForm.contact.value);
 
-      // Handle file upload
       const fileInput = foundForm.querySelector('input[type="file"]');
       if (fileInput.files[0]) {
         formData.append('file', fileInput.files[0]);
@@ -215,11 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
             map.removeLayer(marker);
             marker = null;
           }
-          // Clear the image preview
           if (imagePreview) {
             imagePreview.innerHTML = '';
           }
-          // Refresh the found items list
           const foundItems = await fetchFoundItems();
           render(foundList, foundItems);
         } else {
@@ -232,98 +226,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Add this function to fetch found items from the backend
-  async function fetchFoundItems() {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('https://backendofhackapi.onrender.com/found/items', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (response.ok) {
-        return await response.json();
-      }
-      return [];
-    } catch (error) {
-      console.error('Error fetching found items:', error);
-      return [];
-    }
-  }
-
-  // Lost item form handling
-  const lostForm = document.getElementById('lostForm');
-
-  if (lostForm) {
-    lostForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const token = localStorage.getItem('token');
-      if (!token) {
-        alert('Please login to report a lost item');
-        window.location.href = 'login.html';
-        return;
-      }
-
-      // Get form data
-      const formData = new FormData();
-      
-      // Convert latitude and longitude to float
-      const lat = parseFloat(latitudeInput.value);
-      const lng = parseFloat(longitudeInput.value);
-
-      // Append all required fields
-      formData.append('title', lostForm.title.value);
-      formData.append('description', lostForm.description.value);
-      formData.append('latitude', lat);
-      formData.append('longitude', lng);
-      formData.append('location', locationInput.value);
-      formData.append('contact', lostForm.contact.value);
-
-      // Handle file upload
-      const fileInput = lostForm.querySelector('input[type="file"]');
-      if (fileInput.files[0]) {
-        formData.append('file', fileInput.files[0]);
-      } else {
-        alert('Please select an image file');
-        return;
-      }
-
-      try {
-        const response = await fetch('https://backendofhackapi.onrender.com/lost/add', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          alert('Lost item reported successfully');
-          lostForm.reset();
-          if (marker) {
-            map.removeLayer(marker);
-            marker = null;
-          }
-          // Clear the image preview if it exists
-          const imagePreview = document.getElementById('image-preview');
-          if (imagePreview) {
-            imagePreview.innerHTML = '';
-          }
-        } else {
-          throw new Error(data.detail || 'Failed to report lost item');
-        }
-      } catch (error) {
-        console.error('Error reporting lost item:', error);
-        alert(error.message || 'Failed to report lost item. Please try again.');
-      }
-    });
-  }
-
   // Initial render
   if (foundList) {
-    render(foundList, foundItems);
+    fetchMyItems();
   }
 });
