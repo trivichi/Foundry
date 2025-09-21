@@ -549,3 +549,49 @@ body::after {
 .remove-btn:hover {
     background-color: #c82333;
 }
+
+//lost items - search btn
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top:1vrem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+}
+
+.header-titles {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.separator {
+  color: var(--accent-green);
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+.search-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+  margin-top:0.69rem;
+}
+
+
+.search-link:hover {
+  color: var(--accent-green);
+  font-weight: bold;
+}

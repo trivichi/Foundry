@@ -25,7 +25,15 @@
   </header>
 
   <main class="container">
-    <h1>Report Lost Item</h1>
+    <div class="header-actions">
+      <div class="header-titles">
+        <h1>Report Lost Item</h1>
+        <span class="separator">|</span>
+        <a href="search-lost.html" id="searchLink" class="search-link">
+          Click Here to Search Similar Found Items
+        </a>
+      </div>
+    </div>
     <form id="lostForm" class="form" enctype="multipart/form-data">
       <label>Title <input type="text" name="title" required></label>
       <label>Description <textarea name="description" required></textarea></label>
