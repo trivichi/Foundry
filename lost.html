@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Foundry — Lost Items</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="icon" type="image/png" href="assests/logo.png"/>
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="assests/bg.mp4" type="video/mp4">
+        </video>
+    </div>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="index.html" class="brand"><img src="assests/logo.png" alt="Foundry Logo"></a>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1>Report Lost Item</h1>
+    <form id="lostForm" class="form" enctype="multipart/form-data">
+      <label>Title <input type="text" name="title" required></label>
+      <label>Description <textarea name="description" required></textarea></label>
+      <label>Location <input type="text" name="location"></label>
+      <label>Contact <input type="text" name="contact"></label>
+      <label>Upload Image <input type="file" name="image" accept="image/*"></label>
+      <button type="submit" class="btn primary">Submit</button>
+    </form>
+
+    <h2>Lost Items</h2>
+    <div id="lost-items-list" class="grid"></div>
+  </main>
+
+  <script src="js/lostfound.js"></script>
+</body>
+</html>

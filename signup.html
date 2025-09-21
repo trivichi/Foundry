@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Foundry — Signup</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="icon" type="image/png" href="assests/FOUNDRY.png"/>
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="assests/bg.mp4" type="video/mp4">
+        </video>
+    </div>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="index.html" class="brand"><img src="assests/FOUNDRY.png" alt="Foundry Logo"></a>
+    </div>
+  </header>
+
+  <main class="container auth-page">
+    <h1>Sign Up</h1>
+    <form id="signupForm" class="form">
+      <label>Name <input type="text" name="name" required></label>
+      <label>Email <input type="email" name="email" required></label>
+      <label>Password <input type="password" name="password" required></label>
+      <button type="submit" class="btn primary">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </main>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>

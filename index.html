@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foundry - Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assests/logo.png"/>
+</head>
+<body>
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="assests/bg.mp4" type="video/mp4">
+        </video>
+    </div>
+    <header class="site-header">
+        <div class="container header-row">
+      <a href="index.html" class="brand"><img src="assests/logo.png" alt="Foundry Logo"></a>
+      <nav class="nav-links">
+        <a href="lost.html">Lost</a>
+        <a href="found.html">Found</a>
+      </nav>
+      <div class="auth-buttons">
+      </div>
+    </div>
+    </header>
+
+    <main class="container">
+        <h1>Welcome to Foundry</h1>
+        <p>A simple Lost & Found platform for students and communities.</p>
+
+        <div class="action-buttons">
+            <button  class="big-button lost-btn" data-type="lost" onclick="handleNavigation('lost')">
+                <span class="button-text">Lost Something?</span>
+                <span class="button-description">Report a lost item</span>
+            </button>
+            <button onclick="handleNavigation('found')" class="big-button found-btn" data-type="found">
+                <span class="button-text">Found Something?</span>
+                <span class="button-description">Report a found item</span>
+            </button>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/main.js"></script>
+    <!-- <script>
+    async function loadHomepage() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/homepage", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem("data",data);
+        } else {
+          localStorage.removeItem("token");
+          window.location.href = "login.html";
+        }
+      } catch (err) {
+        console.error("Error loading homepage:", err);
+      }
+    }
+
+    // Logout button
+
+
+    loadHomepage();
+  </script> -->
+    <img src="assests/FOUNDRY.png" alt="Decoration" class="corner-image">
+</body>
+</html>
