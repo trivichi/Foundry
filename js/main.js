@@ -1,33 +1,3 @@
-// // Home page logic
-// document.addEventListener('DOMContentLoaded', () => {
-//   const list = document.getElementById('items-list');
-//   if (!list) return;
-
-//   const lostItems = JSON.parse(localStorage.getItem('lostItems') || '[]');
-//   const foundItems = JSON.parse(localStorage.getItem('foundItems') || '[]');
-
-//   const recent = [...lostItems, ...foundItems]
-//     .sort((a, b) => b.id - a.id)
-//     .slice(0, 5);
-
-//   if (recent.length === 0) {
-//     list.innerHTML = '<p>No items reported yet.</p>';
-//   } else {
-//     recent.forEach(item => {
-//       const card = document.createElement('div');
-//       card.className = 'item-card';
-//       card.innerHTML = `
-//         <h3>${item.title}</h3>
-//         <p>${item.description}</p>
-//         <p><strong>Location:</strong> ${item.location}</p>
-//         <p><strong>Contact:</strong> ${item.contact}</p>
-//         <p><small>${new Date(item.date).toLocaleString()}</small></p>
-//       `;
-//       list.appendChild(card);
-//     });
-//   }
-// });
-
 
 document.addEventListener('DOMContentLoaded', () => {
   // Handle recent items list
